@@ -1,0 +1,6800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICT Test Quiz App</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background: #f1f5f9;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 15px;
+    }
+
+    .app {
+        width: 100%;
+        max-width: 700px;
+        background: white;
+        border-radius: 18px;
+        padding: 25px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    }
+
+    .header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .header h1 {
+        font-size: 28px;
+        margin-bottom: 8px;
+    }
+
+    .header p {
+        color: #64748b;
+    }
+
+    .screen {
+        display: none;
+    }
+
+    .screen.active {
+        display: block;
+    }
+
+    .setup label {
+        display: block;
+        margin-top: 18px;
+        margin-bottom: 8px;
+        font-weight: bold;
+    }
+
+    select,
+    button {
+        width: 100%;
+        padding: 13px;
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        font-size: 16px;
+    }
+
+    button {
+        background: #2563eb;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+        margin-top: 20px;
+    }
+
+    button:hover {
+        opacity: 0.9;
+    }
+
+    .quiz-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        gap: 10px;
+    }
+
+    .progress {
+        color: #475569;
+        font-weight: bold;
+    }
+
+    .timer {
+        background: #fee2e2;
+        color: #b91c1c;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-weight: bold;
+    }
+
+    .question {
+        font-size: 21px;
+        font-weight: bold;
+        margin: 25px 0;
+        line-height: 1.5;
+    }
+
+    .option {
+        width: 100%;
+        text-align: left;
+        background: #f8fafc;
+        color: #0f172a;
+        border: 2px solid #e2e8f0;
+        margin: 8px 0;
+        padding: 14px;
+    }
+
+    .option:hover {
+        background: #e2e8f0;
+    }
+
+    .option.selected {
+        border-color: #2563eb;
+        background: #dbeafe;
+    }
+
+    .option.correct {
+        background: #dcfce7;
+        border-color: #16a34a;
+    }
+
+    .option.wrong {
+        background: #fee2e2;
+        border-color: #dc2626;
+    }
+
+    .navigation {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .navigation button {
+        margin-top: 0;
+    }
+
+    .prev {
+        background: #64748b;
+    }
+
+    .result {
+        text-align: center;
+    }
+
+    .score {
+        font-size: 50px;
+        font-weight: bold;
+        margin: 20px 0;
+    }
+
+    .result p {
+        font-size: 18px;
+        margin: 8px;
+    }
+
+    .review {
+        margin-top: 25px;
+        text-align: left;
+    }
+
+    .review-item {
+        border: 1px solid #cbd5e1;
+        border-radius: 10px;
+        padding: 15px;
+        margin: 10px 0;
+    }
+
+    .correct-text {
+        color: #15803d;
+        font-weight: bold;
+    }
+
+    .wrong-text {
+        color: #dc2626;
+        font-weight: bold;
+    }
+
+    @media (max-width: 500px) {
+        .app {
+            padding: 18px;
+        }
+
+        .header h1 {
+            font-size: 23px;
+        }
+
+        .question {
+            font-size: 18px;
+        }
+
+        .quiz-top {
+            flex-direction: column;
+            align-items: stretch;
+        }
+    }
+</style>
+
+<style>
+#welcomePage{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:30px;
+}
+.welcome-card{
+  width:min(700px,92%);
+  padding:55px 30px;
+  border-radius:24px;
+}
+.welcome-card h1{
+  font-size:42px;
+  margin:0 0 18px;
+}
+.welcome-card p{
+  font-size:25px;
+  font-weight:700;
+  margin:12px 0 30px;
+}
+.welcome-card button{
+  font-size:20px;
+  padding:14px 32px;
+  cursor:pointer;
+}
+#quizSetup{display:none;}
+</style>
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- HOME SCREEN -->
+    <div id="homeScreen" class="screen active">
+
+        <div class="header">
+            <h1>QUIZZ SESSION </h1>
+            
+        </div>
+
+        <div id="welcomePage">
+  <div class="welcome-card">
+    <h1>🎯 WELCOME TO THE QUIZ!</h1>
+    <p>🍀 BEST OF LUCK!</p>
+    <button onclick="openQuizSetup()">START QUIZ 🚀</button>
+  </div>
+</div>
+
+<script>
+function openQuizSetup(){
+  document.getElementById("welcomePage").style.display="none";
+  document.getElementById("quizSetup").style.display="block";
+}
+</script>
+
+<div class="setup" id="quizSetup">
+
+            <label>Select Portion</label>
+
+            <select id="portionSelect">
+                <option value="1">Portion 1 — 100 MCQs</option>
+                <option value="2">Portion 2 — 100 MCQs</option>
+                <option value="3">Portion 3 — 100 MCQs</option>
+                <option value="4">Portion 4 — 100 MCQs</option>
+                <option value="5">Portion 5 — 100 MCQs</option>
+            </select>
+
+            <label>Select Subject</label>
+
+            <select id="subjectSelect">
+                <option value="All">All Subjects</option>
+                <option value="Pakistan Studies">Pakistan Studies</option>
+                <option value="Islamiat">Islamiat</option>
+                <option value="English">English</option>
+                <option value="General Knowledge">General Knowledge</option>
+                <option value="Computer">Computer</option>
+                <option value="Math">Math</option>
+            </select>
+
+            <label>Number of Questions</label>
+
+            <select id="questionCount">
+                <option value="10">10 Questions</option>
+                <option value="25">25 Questions</option>
+                <option value="50">50 Questions</option>
+                <option value="100" selected>100 Questions</option>
+            </select>
+
+            <label>Time</label>
+
+            <select id="timeSelect">
+                <option value="3600" selected>60 Minutes</option>
+                <option value="600">10 Minutes</option>
+                <option value="1200">20 Minutes</option>
+                <option value="1800">30 Minutes</option>
+            </select>
+
+            <button onclick="startQuiz()">Start Quiz 🚀</button>
+
+        </div>
+    </div>
+
+
+    <!-- QUIZ SCREEN -->
+    <div id="quizScreen" class="screen">
+
+        <div class="quiz-top">
+
+            <div class="progress" id="progress">
+                Question 1 / 100
+            </div>
+
+            <div class="timer" id="timer">
+                60:00
+            </div>
+
+        </div>
+
+        <div class="question" id="question">
+            Question goes here
+        </div>
+
+        <div id="options"></div>
+
+        <div class="navigation">
+
+            <button class="prev" onclick="previousQuestion()">
+                ← Previous
+            </button>
+
+            <button onclick="nextQuestion()">
+                Next →
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- RESULT SCREEN -->
+    <div id="resultScreen" class="screen">
+
+        <div class="result">
+
+            <div class="header">
+                <h1>🎉 Quiz Completed!</h1>
+            </div>
+
+            <div class="score" id="score">
+                0%
+            </div>
+
+            <p id="correctResult">Correct: 0</p>
+            <p id="wrongResult">Wrong: 0</p>
+            <p id="totalResult">Total: 0</p>
+            <p id="totalScoreResult"><strong>Total Score: 0 / 100</strong></p>
+
+            <button onclick="showHome()">
+                🏠 Back to Home
+            </button>
+
+            <div class="review">
+                <h2>Answer Review</h2>
+                <div id="reviewList"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   QUESTIONS DATABASE
+========================= */
+
+const questions = [
+    {
+        "subject": "English",
+        "question": "Synonym of 'abundant':",
+        "options": [
+            "Scarce",
+            "Plentiful",
+            "Weak",
+            "Empty"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Antonym of 'ancient':",
+        "options": [
+            "Old",
+            "Modern",
+            "Historic",
+            "Former"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Synonym of 'rapid':",
+        "options": [
+            "Slow",
+            "Swift",
+            "Late",
+            "Quiet"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Antonym of 'expand':",
+        "options": [
+            "Increase",
+            "Contract",
+            "Extend",
+            "Grow"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Choose the correct spelling:",
+        "options": [
+            "Accomodate",
+            "Acommodate",
+            "Accommodate",
+            "Accommadate"
+        ],
+        "answer": 2,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Choose the correct article: ___ honest officer.",
+        "options": [
+            "A",
+            "An",
+            "The",
+            "No article"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Choose the correct article: He bought ___ uniform.",
+        "options": [
+            "a",
+            "an",
+            "the",
+            "no article"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "She ___ to school every day.",
+        "options": [
+            "go",
+            "goes",
+            "going",
+            "gone"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "They ___ completed the task.",
+        "options": [
+            "has",
+            "have",
+            "having",
+            "is"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "If I ___ rich, I would help the poor.",
+        "options": [
+            "am",
+            "was",
+            "were",
+            "be"
+        ],
+        "answer": 2,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "He has lived here ___ 2020.",
+        "options": [
+            "for",
+            "since",
+            "from",
+            "by"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "The opposite of 'victory' is:",
+        "options": [
+            "Success",
+            "Defeat",
+            "Triumph",
+            "Win"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "One who cannot read or write is called:",
+        "options": [
+            "Scholar",
+            "Illiterate",
+            "Author",
+            "Editor"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "One who loves mankind is called:",
+        "options": [
+            "Misanthrope",
+            "Philanthropist",
+            "Traitor",
+            "Optimist"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "A place where books are kept is a:",
+        "options": [
+            "Laboratory",
+            "Library",
+            "Bakery",
+            "Gallery"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "The idiom 'break the ice' means:",
+        "options": [
+            "Freeze water",
+            "Start a friendly conversation",
+            "End a meeting",
+            "Create a problem"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "The idiom 'once in a blue moon' means:",
+        "options": [
+            "Daily",
+            "Very rarely",
+            "At night",
+            "Very quickly"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Choose the correct passive: 'Police arrested the thief.'",
+        "options": [
+            "The thief arrested police.",
+            "The thief was arrested by police.",
+            "The thief is arresting police.",
+            "Police was arrested by thief."
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Choose the correct active form: 'The letter was written by Ali.'",
+        "options": [
+            "Ali wrote the letter.",
+            "Ali writes the letter.",
+            "Ali is writing the letter.",
+            "Ali had written the police."
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Choose the correct preposition: He is good ___ mathematics.",
+        "options": [
+            "in",
+            "at",
+            "on",
+            "for"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Choose the correct preposition: She is afraid ___ dogs.",
+        "options": [
+            "from",
+            "of",
+            "at",
+            "with"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Choose the correct conjunction: Work hard ___ you will fail.",
+        "options": [
+            "and",
+            "or",
+            "but",
+            "because"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Choose the correct word: The medicine had a good ___ on him.",
+        "options": [
+            "affect",
+            "effect",
+            "effection",
+            "effective"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Choose the correct word: Please ___ my advice.",
+        "options": [
+            "accept",
+            "except",
+            "expect",
+            "access"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Plural of 'criterion' is:",
+        "options": [
+            "Criterions",
+            "Criteria",
+            "Criterionses",
+            "Criterion"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Plural of 'phenomenon' is:",
+        "options": [
+            "Phenomenons",
+            "Phenomena",
+            "Phenomenon",
+            "Phenomenae"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Past tense of 'go' is:",
+        "options": [
+            "Goed",
+            "Gone",
+            "Went",
+            "Going"
+        ],
+        "answer": 2,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Past participle of 'write' is:",
+        "options": [
+            "Wrote",
+            "Written",
+            "Writing",
+            "Writes"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Which is a pronoun?",
+        "options": [
+            "Quickly",
+            "Beautiful",
+            "They",
+            "Honesty"
+        ],
+        "answer": 2,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Which is an adverb?",
+        "options": [
+            "Slow",
+            "Slowly",
+            "Slowness",
+            "Slower"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Which is an adjective?",
+        "options": [
+            "Beauty",
+            "Beautiful",
+            "Beautify",
+            "Beautifully"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Which is a verb?",
+        "options": [
+            "Honesty",
+            "Run",
+            "Beautiful",
+            "Quickly"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "The comparative form of 'good' is:",
+        "options": [
+            "Gooder",
+            "Best",
+            "Better",
+            "More good"
+        ],
+        "answer": 2,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "The superlative form of 'bad' is:",
+        "options": [
+            "Badder",
+            "Worse",
+            "Worst",
+            "More bad"
+        ],
+        "answer": 2,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Choose the correct sentence:",
+        "options": [
+            "He don't know.",
+            "He doesn't know.",
+            "He not know.",
+            "He didn't knows."
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "A sentence that asks a question is:",
+        "options": [
+            "Declarative",
+            "Interrogative",
+            "Imperative",
+            "Exclamatory"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "A sentence giving a command is:",
+        "options": [
+            "Imperative",
+            "Interrogative",
+            "Declarative",
+            "Conditional"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "A sentence expressing strong feeling is:",
+        "options": [
+            "Declarative",
+            "Interrogative",
+            "Exclamatory",
+            "Imperative"
+        ],
+        "answer": 2,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Synonym of 'assist' is:",
+        "options": [
+            "Help",
+            "Harm",
+            "Stop",
+            "Ignore"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Antonym of 'generous' is:",
+        "options": [
+            "Kind",
+            "Helpful",
+            "Stingy",
+            "Noble"
+        ],
+        "answer": 2,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Synonym of 'accurate' is:",
+        "options": [
+            "Correct",
+            "Wrong",
+            "Rough",
+            "Weak"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Antonym of 'permanent' is:",
+        "options": [
+            "Fixed",
+            "Temporary",
+            "Stable",
+            "Lasting"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "One who studies stars is an:",
+        "options": [
+            "Archaeologist",
+            "Astronomer",
+            "Economist",
+            "Biologist"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "A government by the people is called:",
+        "options": [
+            "Monarchy",
+            "Democracy",
+            "Dictatorship",
+            "Oligarchy"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "The word 'quickly' is a:",
+        "options": [
+            "Noun",
+            "Verb",
+            "Adverb",
+            "Pronoun"
+        ],
+        "answer": 2,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "The word 'honesty' is a:",
+        "options": [
+            "Noun",
+            "Adjective",
+            "Verb",
+            "Adverb"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "English",
+        "question": "Choose the correct question tag: 'He is honest, ___?'",
+        "options": [
+            "isn't he",
+            "is he",
+            "doesn't he",
+            "wasn't he"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The Lahore Resolution was passed on:",
+        "options": [
+            "23 March 1940",
+            "14 August 1947",
+            "3 June 1947",
+            "11 September 1948"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The founder of Pakistan was:",
+        "options": [
+            "Allama Iqbal",
+            "Quaid-e-Azam Muhammad Ali Jinnah",
+            "Liaquat Ali Khan",
+            "Sir Syed Ahmad Khan"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "Pakistan became independent in:",
+        "options": [
+            "1930",
+            "1940",
+            "1947",
+            "1956"
+        ],
+        "answer": 2,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The first capital of Pakistan was:",
+        "options": [
+            "Lahore",
+            "Karachi",
+            "Islamabad",
+            "Rawalpindi"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "Islamabad became the capital of Pakistan in the:",
+        "options": [
+            "1950s",
+            "1960s",
+            "1970s",
+            "1980s"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The national language of Pakistan is:",
+        "options": [
+            "Punjabi",
+            "Urdu",
+            "Sindhi",
+            "Pashto"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The national flower of Pakistan is:",
+        "options": [
+            "Rose",
+            "Jasmine",
+            "Lily",
+            "Tulip"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The national animal of Pakistan is:",
+        "options": [
+            "Markhor",
+            "Lion",
+            "Snow leopard",
+            "Horse"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The national bird of Pakistan is:",
+        "options": [
+            "Chukar",
+            "Eagle",
+            "Peacock",
+            "Parrot"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The national tree of Pakistan is:",
+        "options": [
+            "Neem",
+            "Deodar",
+            "Banyan",
+            "Pine"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The national poet of Pakistan is:",
+        "options": [
+            "Faiz Ahmed Faiz",
+            "Allama Muhammad Iqbal",
+            "Mir Taqi Mir",
+            "Ghalib"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The first Governor-General of Pakistan was:",
+        "options": [
+            "Liaquat Ali Khan",
+            "Muhammad Ali Jinnah",
+            "Khawaja Nazimuddin",
+            "Iskander Mirza"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The first Prime Minister of Pakistan was:",
+        "options": [
+            "Liaquat Ali Khan",
+            "Ayub Khan",
+            "Zulfikar Ali Bhutto",
+            "Muhammad Ali Bogra"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "Pakistan's first constitution was enforced in:",
+        "options": [
+            "1956",
+            "1962",
+            "1973",
+            "1949"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The Constitution of 1973 was adopted on:",
+        "options": [
+            "10 April 1973",
+            "14 August 1973",
+            "23 March 1973",
+            "1 July 1973"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The Objectives Resolution was passed in:",
+        "options": [
+            "1947",
+            "1948",
+            "1949",
+            "1951"
+        ],
+        "answer": 2,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The highest civil award of Pakistan is:",
+        "options": [
+            "Sitara-e-Imtiaz",
+            "Hilal-e-Imtiaz",
+            "Nishan-e-Imtiaz",
+            "Tamgha-e-Imtiaz"
+        ],
+        "answer": 2,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The largest province of Pakistan by area is:",
+        "options": [
+            "Punjab",
+            "Sindh",
+            "Balochistan",
+            "Khyber Pakhtunkhwa"
+        ],
+        "answer": 2,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The largest province by population is:",
+        "options": [
+            "Punjab",
+            "Sindh",
+            "Balochistan",
+            "Khyber Pakhtunkhwa"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The smallest province by area is:",
+        "options": [
+            "Punjab",
+            "Sindh",
+            "Balochistan",
+            "Khyber Pakhtunkhwa"
+        ],
+        "answer": 3,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The Indus River flows into the:",
+        "options": [
+            "Arabian Sea",
+            "Red Sea",
+            "Bay of Bengal",
+            "Caspian Sea"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "K2 is located in the:",
+        "options": [
+            "Himalayas",
+            "Karakoram",
+            "Hindu Kush",
+            "Sulaiman Range"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The port city Gwadar is in:",
+        "options": [
+            "Sindh",
+            "Punjab",
+            "Balochistan",
+            "KPK"
+        ],
+        "answer": 2,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "Minar-e-Pakistan is in:",
+        "options": [
+            "Lahore",
+            "Karachi",
+            "Islamabad",
+            "Multan"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The Pakistan Monument is in:",
+        "options": [
+            "Lahore",
+            "Islamabad",
+            "Peshawar",
+            "Quetta"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The first female Prime Minister of Pakistan was:",
+        "options": [
+            "Fatima Jinnah",
+            "Benazir Bhutto",
+            "Begum Rana Liaquat Ali Khan",
+            "Hina Rabbani Khar"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "Pakistan joined the United Nations in:",
+        "options": [
+            "1947",
+            "1948",
+            "1950",
+            "1956"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The State Bank of Pakistan was inaugurated in:",
+        "options": [
+            "1947",
+            "1948",
+            "1950",
+            "1956"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The national mosque of Pakistan in Islamabad is:",
+        "options": [
+            "Badshahi Mosque",
+            "Faisal Mosque",
+            "Wazir Khan Mosque",
+            "Data Darbar"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The Badshahi Mosque is located in:",
+        "options": [
+            "Lahore",
+            "Karachi",
+            "Multan",
+            "Islamabad"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The Pakistan Movement was based largely on the:",
+        "options": [
+            "Two-Nation Theory",
+            "Doctrine of Lapse",
+            "Truman Doctrine",
+            "Monroe Doctrine"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The All-India Muslim League was founded in:",
+        "options": [
+            "1905",
+            "1906",
+            "1907",
+            "1911"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The All-India Muslim League was founded at:",
+        "options": [
+            "Lahore",
+            "Dhaka",
+            "Delhi",
+            "Karachi"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The Simla Deputation took place in:",
+        "options": [
+            "1905",
+            "1906",
+            "1916",
+            "1930"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The Allahabad Address was delivered by:",
+        "options": [
+            "Sir Syed Ahmad Khan",
+            "Allama Iqbal",
+            "Jinnah",
+            "Liaquat Ali Khan"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The Allahabad Address was delivered in:",
+        "options": [
+            "1928",
+            "1930",
+            "1932",
+            "1940"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The Lucknow Pact was signed in:",
+        "options": [
+            "1913",
+            "1916",
+            "1919",
+            "1922"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The Nehru Report was published in:",
+        "options": [
+            "1927",
+            "1928",
+            "1929",
+            "1930"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The Round Table Conferences were held in:",
+        "options": [
+            "London",
+            "Delhi",
+            "Lahore",
+            "Karachi"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The first martial law in Pakistan was imposed in:",
+        "options": [
+            "1956",
+            "1958",
+            "1962",
+            "1969"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "Pakistan's first President was:",
+        "options": [
+            "Ayub Khan",
+            "Iskander Mirza",
+            "Yahya Khan",
+            "Zulfikar Ali Bhutto"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The 1962 Constitution was introduced under:",
+        "options": [
+            "Ayub Khan",
+            "Yahya Khan",
+            "Zia-ul-Haq",
+            "Bhutto"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The 1973 Constitution established a:",
+        "options": [
+            "Presidential system",
+            "Parliamentary system",
+            "Monarchical system",
+            "Federal monarchy"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "Pakistan's upper house of Parliament is:",
+        "options": [
+            "National Assembly",
+            "Senate",
+            "Cabinet",
+            "Supreme Court"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "Pakistan's lower house of Parliament is:",
+        "options": [
+            "Senate",
+            "National Assembly",
+            "Provincial Assembly",
+            "Cabinet"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The Supreme Court of Pakistan is the country's:",
+        "options": [
+            "Highest court",
+            "Lowest court",
+            "Military court",
+            "Local court"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The national currency of Pakistan is:",
+        "options": [
+            "Taka",
+            "Rupee",
+            "Riyal",
+            "Dinar"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The Pakistan-China border is known near the:",
+        "options": [
+            "Khunjerab Pass",
+            "Khyber Pass",
+            "Bolan Pass",
+            "Lowari Pass"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "Pakistan Studies",
+        "question": "The Khyber Pass connects Pakistan with:",
+        "options": [
+            "India",
+            "Afghanistan",
+            "Iran",
+            "China"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The number of pillars of Islam is:",
+        "options": [
+            "3",
+            "4",
+            "5",
+            "6"
+        ],
+        "answer": 2,
+        "portion": 1
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The number of obligatory daily prayers is:",
+        "options": [
+            "3",
+            "4",
+            "5",
+            "6"
+        ],
+        "answer": 2,
+        "portion": 1
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The Holy Quran was revealed in:",
+        "options": [
+            "Arabic",
+            "Persian",
+            "Urdu",
+            "Hebrew"
+        ],
+        "answer": 0,
+        "portion": 1
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The first month of the Islamic calendar is:",
+        "options": [
+            "Ramadan",
+            "Muharram",
+            "Rajab",
+            "Shaban"
+        ],
+        "answer": 1,
+        "portion": 1
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The ninth month of the Islamic calendar is:",
+        "options": [
+            "Ramadan",
+            "Muharram",
+            "Safar",
+            "Shawwal"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The last Prophet is:",
+        "options": [
+            "Musa (AS)",
+            "Isa (AS)",
+            "Muhammad (PBUH)",
+            "Ibrahim (AS)"
+        ],
+        "answer": 2,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The first revealed word of the Quran was:",
+        "options": [
+            "Qul",
+            "Iqra",
+            "Bismillah",
+            "Alhamd"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The first Surah of the Quran is:",
+        "options": [
+            "Al-Baqarah",
+            "Al-Fatihah",
+            "Al-Ikhlas",
+            "An-Nas"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The longest Surah of the Quran is:",
+        "options": [
+            "Al-Fatihah",
+            "Al-Baqarah",
+            "Yasin",
+            "Al-Kahf"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The shortest Surah of the Quran is:",
+        "options": [
+            "Al-Kawthar",
+            "Al-Falaq",
+            "An-Nas",
+            "Al-Asr"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "Zakat is one of the:",
+        "options": [
+            "Pillars of Islam",
+            "Books of Hadith",
+            "Articles of faith",
+            "Months"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "Fasting in Ramadan is called:",
+        "options": [
+            "Salah",
+            "Sawm",
+            "Hajj",
+            "Zakat"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "Pilgrimage to Makkah is called:",
+        "options": [
+            "Umrah only",
+            "Hajj",
+            "Salah",
+            "Sawm"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The Qiblah is toward:",
+        "options": [
+            "Madinah",
+            "Makkah",
+            "Jerusalem only",
+            "Taif"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The first mosque built in Islam is commonly identified as:",
+        "options": [
+            "Masjid Quba",
+            "Masjid Nabawi",
+            "Masjid al-Haram",
+            "Al-Aqsa"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "Masjid al-Haram is in:",
+        "options": [
+            "Madinah",
+            "Makkah",
+            "Taif",
+            "Jeddah"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "Masjid an-Nabawi is in:",
+        "options": [
+            "Makkah",
+            "Madinah",
+            "Jerusalem",
+            "Kufa"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The Hijrah was from Makkah to:",
+        "options": [
+            "Taif",
+            "Madinah",
+            "Damascus",
+            "Baghdad"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The Islamic calendar begins with the:",
+        "options": [
+            "Birth of Prophet Muhammad (PBUH)",
+            "Hijrah",
+            "First revelation",
+            "Conquest of Makkah"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The first Caliph after Prophet Muhammad (PBUH) was:",
+        "options": [
+            "Umar (RA)",
+            "Abu Bakr (RA)",
+            "Uthman (RA)",
+            "Ali (RA)"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The second Caliph was:",
+        "options": [
+            "Abu Bakr (RA)",
+            "Umar (RA)",
+            "Uthman (RA)",
+            "Ali (RA)"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The third Caliph was:",
+        "options": [
+            "Ali (RA)",
+            "Umar (RA)",
+            "Uthman (RA)",
+            "Abu Bakr (RA)"
+        ],
+        "answer": 2,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The fourth Caliph was:",
+        "options": [
+            "Ali (RA)",
+            "Uthman (RA)",
+            "Umar (RA)",
+            "Abu Bakr (RA)"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The Battle of Badr took place in:",
+        "options": [
+            "2 AH",
+            "3 AH",
+            "5 AH",
+            "8 AH"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The Battle of Uhud took place in:",
+        "options": [
+            "2 AH",
+            "3 AH",
+            "5 AH",
+            "8 AH"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The Battle of Khandaq is also called the Battle of:",
+        "options": [
+            "Trench",
+            "Badr",
+            "Uhud",
+            "Hunayn"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The Treaty of Hudaybiyyah was made in:",
+        "options": [
+            "6 AH",
+            "7 AH",
+            "8 AH",
+            "10 AH"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The Conquest of Makkah occurred in:",
+        "options": [
+            "6 AH",
+            "7 AH",
+            "8 AH",
+            "10 AH"
+        ],
+        "answer": 2,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The Farewell Hajj occurred in:",
+        "options": [
+            "8 AH",
+            "9 AH",
+            "10 AH",
+            "11 AH"
+        ],
+        "answer": 2,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The Holy Quran has:",
+        "options": [
+            "110 Surahs",
+            "112 Surahs",
+            "114 Surahs",
+            "116 Surahs"
+        ],
+        "answer": 2,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "Surah Yasin is the:",
+        "options": [
+            "36th Surah",
+            "40th Surah",
+            "55th Surah",
+            "67th Surah"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "Surah Al-Ikhlas emphasizes:",
+        "options": [
+            "Tawheed",
+            "Zakat",
+            "Hajj",
+            "Inheritance"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The word 'Islam' is associated with:",
+        "options": [
+            "Submission and peace",
+            "Wealth",
+            "Kingship",
+            "Trade"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "Iman means:",
+        "options": [
+            "Faith",
+            "Prayer",
+            "Fasting",
+            "Charity"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "Salah means:",
+        "options": [
+            "Prayer",
+            "Fasting",
+            "Pilgrimage",
+            "Charity"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "Sawm means:",
+        "options": [
+            "Prayer",
+            "Fasting",
+            "Pilgrimage",
+            "Charity"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "Zakat primarily means:",
+        "options": [
+            "Obligatory charity",
+            "Pilgrimage",
+            "Prayer",
+            "Fasting"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "Hajj is performed in the Islamic month of:",
+        "options": [
+            "Muharram",
+            "Ramadan",
+            "Dhul-Hijjah",
+            "Rajab"
+        ],
+        "answer": 2,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "Eid-ul-Fitr comes after:",
+        "options": [
+            "Hajj",
+            "Ramadan",
+            "Muharram",
+            "Safar"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "Eid-ul-Adha is associated with:",
+        "options": [
+            "Hajj",
+            "Zakat-ul-Fitr only",
+            "Hijrah",
+            "Battle of Badr"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The first revelation came in the Cave of:",
+        "options": [
+            "Hira",
+            "Thawr",
+            "Uhud",
+            "Safa"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The angel who brought revelation was:",
+        "options": [
+            "Jibril (AS)",
+            "Mikail (AS)",
+            "Israfil (AS)",
+            "Izrail (AS)"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The Prophet Muhammad (PBUH) was born in:",
+        "options": [
+            "Madinah",
+            "Makkah",
+            "Taif",
+            "Jerusalem"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The Prophet Muhammad (PBUH) migrated to Madinah in:",
+        "options": [
+            "610 CE",
+            "622 CE",
+            "632 CE",
+            "640 CE"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The Kaaba is located in:",
+        "options": [
+            "Madinah",
+            "Makkah",
+            "Taif",
+            "Jerusalem"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "Friday congregational prayer is called:",
+        "options": [
+            "Jumu'ah",
+            "Tahajjud",
+            "Witr",
+            "Eid"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The call to prayer is:",
+        "options": [
+            "Adhan",
+            "Khutbah",
+            "Iqamah only",
+            "Tafsir"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The sermon delivered before Friday prayer is called:",
+        "options": [
+            "Khutbah",
+            "Adhan",
+            "Sawm",
+            "Zakat"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The Holy Quran is divided into:",
+        "options": [
+            "20 Juz",
+            "25 Juz",
+            "30 Juz",
+            "40 Juz"
+        ],
+        "answer": 2,
+        "portion": 2
+    },
+    {
+        "subject": "Islamiat",
+        "question": "The first revealed verses are from Surah:",
+        "options": [
+            "Al-Alaq",
+            "Al-Fatihah",
+            "Al-Baqarah",
+            "Yasin"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The largest ocean is:",
+        "options": [
+            "Atlantic",
+            "Indian",
+            "Pacific",
+            "Arctic"
+        ],
+        "answer": 2,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The largest continent is:",
+        "options": [
+            "Africa",
+            "Asia",
+            "Europe",
+            "Australia"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The smallest continent is:",
+        "options": [
+            "Europe",
+            "Australia",
+            "Africa",
+            "South America"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The capital of Saudi Arabia is:",
+        "options": [
+            "Jeddah",
+            "Riyadh",
+            "Makkah",
+            "Medina"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The capital of Turkey is:",
+        "options": [
+            "Istanbul",
+            "Ankara",
+            "Izmir",
+            "Bursa"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The capital of China is:",
+        "options": [
+            "Shanghai",
+            "Beijing",
+            "Hong Kong",
+            "Guangzhou"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The capital of Australia is:",
+        "options": [
+            "Sydney",
+            "Melbourne",
+            "Canberra",
+            "Perth"
+        ],
+        "answer": 2,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The capital of Canada is:",
+        "options": [
+            "Toronto",
+            "Ottawa",
+            "Vancouver",
+            "Montreal"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The capital of Japan is:",
+        "options": [
+            "Kyoto",
+            "Tokyo",
+            "Osaka",
+            "Nagoya"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The capital of Egypt is:",
+        "options": [
+            "Alexandria",
+            "Cairo",
+            "Giza",
+            "Luxor"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The Red Planet is:",
+        "options": [
+            "Venus",
+            "Mars",
+            "Jupiter",
+            "Mercury"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The largest planet is:",
+        "options": [
+            "Earth",
+            "Saturn",
+            "Jupiter",
+            "Neptune"
+        ],
+        "answer": 2,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The planet closest to the Sun is:",
+        "options": [
+            "Venus",
+            "Mercury",
+            "Earth",
+            "Mars"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The natural satellite of Earth is:",
+        "options": [
+            "Sun",
+            "Moon",
+            "Mars",
+            "Venus"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The largest hot desert is:",
+        "options": [
+            "Gobi",
+            "Sahara",
+            "Thar",
+            "Arabian"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The highest mountain above sea level is:",
+        "options": [
+            "K2",
+            "Mount Everest",
+            "Nanga Parbat",
+            "Denali"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The longest river commonly listed in world geography is:",
+        "options": [
+            "Amazon",
+            "Nile",
+            "Yangtze",
+            "Indus"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The currency of Japan is:",
+        "options": [
+            "Won",
+            "Yuan",
+            "Yen",
+            "Ringgit"
+        ],
+        "answer": 2,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The currency of the United Kingdom is:",
+        "options": [
+            "Euro",
+            "Pound sterling",
+            "Dollar",
+            "Franc"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The currency of China is:",
+        "options": [
+            "Yuan",
+            "Yen",
+            "Won",
+            "Rupee"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The headquarters of the United Nations is in:",
+        "options": [
+            "Geneva",
+            "New York",
+            "Paris",
+            "London"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The headquarters of WHO is in:",
+        "options": [
+            "Rome",
+            "Geneva",
+            "New York",
+            "Vienna"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The headquarters of UNESCO is in:",
+        "options": [
+            "Paris",
+            "London",
+            "Berlin",
+            "Madrid"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The headquarters of IMF is in:",
+        "options": [
+            "Washington, D.C.",
+            "Geneva",
+            "Paris",
+            "Rome"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The headquarters of OIC is in:",
+        "options": [
+            "Jeddah",
+            "Cairo",
+            "Riyadh",
+            "Doha"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The Olympic Games are held every:",
+        "options": [
+            "2 years",
+            "3 years",
+            "4 years",
+            "5 years"
+        ],
+        "answer": 2,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The number of continents is commonly:",
+        "options": [
+            "5",
+            "6",
+            "7",
+            "8"
+        ],
+        "answer": 2,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The number of oceans commonly recognized is:",
+        "options": [
+            "3",
+            "4",
+            "5",
+            "6"
+        ],
+        "answer": 2,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The SI unit of length is:",
+        "options": [
+            "Foot",
+            "Meter",
+            "Yard",
+            "Mile"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The SI unit of mass is:",
+        "options": [
+            "Gram",
+            "Kilogram",
+            "Pound",
+            "Ton"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The SI unit of time is:",
+        "options": [
+            "Minute",
+            "Second",
+            "Hour",
+            "Day"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The freezing point of water is:",
+        "options": [
+            "0°C",
+            "10°C",
+            "50°C",
+            "100°C"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The boiling point of water at standard pressure is:",
+        "options": [
+            "50°C",
+            "90°C",
+            "100°C",
+            "120°C"
+        ],
+        "answer": 2,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The largest mammal is:",
+        "options": [
+            "Elephant",
+            "Blue whale",
+            "Giraffe",
+            "Hippopotamus"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The fastest land animal is:",
+        "options": [
+            "Lion",
+            "Cheetah",
+            "Horse",
+            "Leopard"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The study of plants is called:",
+        "options": [
+            "Zoology",
+            "Botany",
+            "Geology",
+            "Ecology"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The study of animals is called:",
+        "options": [
+            "Botany",
+            "Zoology",
+            "Astronomy",
+            "Geography"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The study of earthquakes is related to:",
+        "options": [
+            "Seismology",
+            "Meteorology",
+            "Biology",
+            "Taxonomy"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The gas most abundant in Earth's atmosphere is:",
+        "options": [
+            "Oxygen",
+            "Nitrogen",
+            "Carbon dioxide",
+            "Hydrogen"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The chemical symbol for gold is:",
+        "options": [
+            "Ag",
+            "Au",
+            "Fe",
+            "Gd"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The chemical symbol for silver is:",
+        "options": [
+            "Ag",
+            "Au",
+            "Si",
+            "Sr"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The number of sides of a hexagon is:",
+        "options": [
+            "5",
+            "6",
+            "7",
+            "8"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "A triangle has how many sides?",
+        "options": [
+            "2",
+            "3",
+            "4",
+            "5"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The largest organ of the human body is:",
+        "options": [
+            "Heart",
+            "Skin",
+            "Liver",
+            "Lung"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The human heart normally has:",
+        "options": [
+            "2 chambers",
+            "3 chambers",
+            "4 chambers",
+            "5 chambers"
+        ],
+        "answer": 2,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The organ responsible for pumping blood is:",
+        "options": [
+            "Lung",
+            "Heart",
+            "Kidney",
+            "Liver"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The instrument used to measure temperature is:",
+        "options": [
+            "Barometer",
+            "Thermometer",
+            "Hygrometer",
+            "Altimeter"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The instrument used to measure atmospheric pressure is:",
+        "options": [
+            "Barometer",
+            "Thermometer",
+            "Ammeter",
+            "Compass"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "General Knowledge",
+        "question": "The instrument used to find direction is:",
+        "options": [
+            "Compass",
+            "Barometer",
+            "Microscope",
+            "Voltmeter"
+        ],
+        "answer": 0,
+        "portion": 2
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The basic unit of life is:",
+        "options": [
+            "Tissue",
+            "Cell",
+            "Organ",
+            "Atom"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "Photosynthesis mainly occurs in:",
+        "options": [
+            "Roots",
+            "Leaves",
+            "Flowers",
+            "Seeds"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The green pigment in plants is:",
+        "options": [
+            "Hemoglobin",
+            "Chlorophyll",
+            "Melanin",
+            "Keratin"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "Plants absorb carbon dioxide mainly through:",
+        "options": [
+            "Roots",
+            "Stomata",
+            "Flowers",
+            "Seeds"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The human respiratory organ is:",
+        "options": [
+            "Kidney",
+            "Lung",
+            "Liver",
+            "Stomach"
+        ],
+        "answer": 1,
+        "portion": 2
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "Red blood cells mainly carry:",
+        "options": [
+            "Oxygen",
+            "Bile",
+            "Urine",
+            "Insulin"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "White blood cells help with:",
+        "options": [
+            "Defense against infection",
+            "Digestion",
+            "Hearing",
+            "Bone movement"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The liquid part of blood is:",
+        "options": [
+            "Plasma",
+            "Platelet",
+            "Hemoglobin",
+            "Lymphocyte"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The vitamin produced in skin with sunlight is:",
+        "options": [
+            "Vitamin A",
+            "Vitamin B12",
+            "Vitamin C",
+            "Vitamin D"
+        ],
+        "answer": 3,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "Vitamin C deficiency causes:",
+        "options": [
+            "Rickets",
+            "Scurvy",
+            "Night blindness",
+            "Goiter"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "Vitamin D deficiency may cause:",
+        "options": [
+            "Rickets",
+            "Scurvy",
+            "Anemia",
+            "Malaria"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "Iron deficiency commonly causes:",
+        "options": [
+            "Anemia",
+            "Scurvy",
+            "Rickets",
+            "Diabetes"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The force that pulls objects toward Earth is:",
+        "options": [
+            "Friction",
+            "Gravity",
+            "Magnetism",
+            "Buoyancy"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The SI unit of force is:",
+        "options": [
+            "Joule",
+            "Newton",
+            "Watt",
+            "Pascal"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The SI unit of energy is:",
+        "options": [
+            "Joule",
+            "Newton",
+            "Volt",
+            "Ohm"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The SI unit of power is:",
+        "options": [
+            "Watt",
+            "Joule",
+            "Newton",
+            "Pascal"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The speed of light is approximately:",
+        "options": [
+            "3×10^8 m/s",
+            "3×10^6 m/s",
+            "3×10^4 m/s",
+            "3×10^2 m/s"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "Sound cannot travel through:",
+        "options": [
+            "Air",
+            "Water",
+            "Vacuum",
+            "Steel"
+        ],
+        "answer": 2,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "A material that allows electric current to pass easily is a:",
+        "options": [
+            "Conductor",
+            "Insulator",
+            "Magnet",
+            "Resistor only"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "Copper is generally a good:",
+        "options": [
+            "Insulator",
+            "Conductor",
+            "Fuel",
+            "Semiconductor only"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "Rubber is generally an:",
+        "options": [
+            "Insulator",
+            "Conductor",
+            "Metal",
+            "Electrolyte"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The center of an atom is called the:",
+        "options": [
+            "Electron cloud",
+            "Nucleus",
+            "Shell",
+            "Orbit"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "A negatively charged particle is the:",
+        "options": [
+            "Proton",
+            "Electron",
+            "Neutron",
+            "Photon"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "A positively charged particle is the:",
+        "options": [
+            "Electron",
+            "Proton",
+            "Neutron",
+            "Atom"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "A particle with no electric charge is the:",
+        "options": [
+            "Proton",
+            "Electron",
+            "Neutron",
+            "Ion"
+        ],
+        "answer": 2,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "Water's chemical formula is:",
+        "options": [
+            "CO2",
+            "H2O",
+            "O2",
+            "NaCl"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "Carbon dioxide has the formula:",
+        "options": [
+            "CO2",
+            "CO",
+            "C2O",
+            "CaO"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "Common salt has the formula:",
+        "options": [
+            "NaCl",
+            "HCl",
+            "KClO3",
+            "CaCO3"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The pH of a neutral solution is:",
+        "options": [
+            "0",
+            "5",
+            "7",
+            "14"
+        ],
+        "answer": 2,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "An acid has a pH generally:",
+        "options": [
+            "Below 7",
+            "Exactly 7",
+            "Above 7",
+            "Always 14"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "A base generally has a pH:",
+        "options": [
+            "Below 7",
+            "Above 7",
+            "Exactly 7",
+            "Always 0"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The process of changing liquid into gas is:",
+        "options": [
+            "Condensation",
+            "Evaporation",
+            "Freezing",
+            "Melting"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The process of gas changing into liquid is:",
+        "options": [
+            "Condensation",
+            "Sublimation",
+            "Melting",
+            "Boiling"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "Solid changing directly into gas is:",
+        "options": [
+            "Freezing",
+            "Sublimation",
+            "Condensation",
+            "Melting"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The boiling point is affected by:",
+        "options": [
+            "Pressure",
+            "Color only",
+            "Shape only",
+            "Mass only"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The Earth rotates around its axis in about:",
+        "options": [
+            "12 hours",
+            "24 hours",
+            "48 hours",
+            "7 days"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The Earth revolves around the Sun in about:",
+        "options": [
+            "24 hours",
+            "30 days",
+            "365 days",
+            "10 years"
+        ],
+        "answer": 2,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "A lunar eclipse occurs when:",
+        "options": [
+            "Earth is between Sun and Moon",
+            "Moon is between Sun and Earth",
+            "Sun is between Earth and Moon",
+            "Mars blocks the Sun"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "A solar eclipse occurs when:",
+        "options": [
+            "Earth is between Sun and Moon",
+            "Moon is between Sun and Earth",
+            "Jupiter is between them",
+            "Sun is between Earth and Moon"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The ozone layer helps absorb:",
+        "options": [
+            "Ultraviolet radiation",
+            "Sound waves",
+            "Radio signals only",
+            "Visible light only"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The main source of energy for Earth is:",
+        "options": [
+            "Moon",
+            "Sun",
+            "Wind",
+            "Coal"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "Renewable energy source:",
+        "options": [
+            "Coal",
+            "Solar energy",
+            "Petroleum",
+            "Natural gas"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "A simple machine with a wheel and rope is a:",
+        "options": [
+            "Pulley",
+            "Screw",
+            "Wedge",
+            "Lever only"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The device that converts electrical energy to mechanical energy is commonly a:",
+        "options": [
+            "Motor",
+            "Generator",
+            "Battery",
+            "Transformer"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "A generator converts mechanical energy into:",
+        "options": [
+            "Electrical energy",
+            "Chemical energy",
+            "Sound only",
+            "Light only"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The unit of electrical resistance is:",
+        "options": [
+            "Ohm",
+            "Volt",
+            "Ampere",
+            "Watt"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The unit of electric current is:",
+        "options": [
+            "Volt",
+            "Ampere",
+            "Ohm",
+            "Joule"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The unit of voltage is:",
+        "options": [
+            "Ampere",
+            "Volt",
+            "Ohm",
+            "Watt"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The unit of frequency is:",
+        "options": [
+            "Hertz",
+            "Newton",
+            "Pascal",
+            "Joule"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Everyday Science",
+        "question": "The branch of science dealing with matter and its changes is:",
+        "options": [
+            "Physics",
+            "Chemistry",
+            "Astronomy",
+            "Geography"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "CPU stands for:",
+        "options": [
+            "Central Processing Unit",
+            "Computer Processing Utility",
+            "Central Program Unit",
+            "Central Power Unit"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "RAM stands for:",
+        "options": [
+            "Random Access Memory",
+            "Read Access Memory",
+            "Rapid Application Module",
+            "Random Application Machine"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "ROM stands for:",
+        "options": [
+            "Read Only Memory",
+            "Random Only Memory",
+            "Read Open Machine",
+            "Run Only Memory"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Which is an operating system?",
+        "options": [
+            "Windows",
+            "Google",
+            "Facebook",
+            "YouTube"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Which is an input device?",
+        "options": [
+            "Keyboard",
+            "Monitor",
+            "Printer",
+            "Speaker"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Which is an output device?",
+        "options": [
+            "Keyboard",
+            "Monitor",
+            "Mouse",
+            "Scanner"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Which device is used to print documents?",
+        "options": [
+            "Printer",
+            "Scanner",
+            "Router",
+            "Keyboard"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Which device is used to scan a paper document?",
+        "options": [
+            "Scanner",
+            "Speaker",
+            "Monitor",
+            "Router"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Which device is commonly used for permanent magnetic storage?",
+        "options": [
+            "Hard disk",
+            "RAM",
+            "CPU",
+            "Cache only"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Which memory is volatile?",
+        "options": [
+            "RAM",
+            "ROM",
+            "DVD",
+            "Hard disk"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "The brain of the computer is commonly called:",
+        "options": [
+            "CPU",
+            "Mouse",
+            "Monitor",
+            "Printer"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "1 byte equals:",
+        "options": [
+            "4 bits",
+            "8 bits",
+            "16 bits",
+            "32 bits"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "A group of 8 bits is a:",
+        "options": [
+            "Byte",
+            "Nibble",
+            "Word only",
+            "Kilobyte"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "1 kilobyte is commonly treated in basic computing as:",
+        "options": [
+            "1024 bytes",
+            "100 bytes",
+            "512 bytes",
+            "2048 bytes"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "HTML is mainly used to create:",
+        "options": [
+            "Web pages",
+            "Databases only",
+            "Antivirus software",
+            "Operating systems"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "CSS is mainly used for:",
+        "options": [
+            "Web page styling",
+            "Data storage",
+            "CPU control",
+            "Email delivery"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "JavaScript is commonly used to add:",
+        "options": [
+            "Interactivity to web pages",
+            "Printer ink",
+            "Hardware power",
+            "Disk space"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "URL stands for:",
+        "options": [
+            "Uniform Resource Locator",
+            "Universal Record Link",
+            "User Resource Line",
+            "Uniform Router Link"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "HTTP is a protocol used for:",
+        "options": [
+            "Web communication",
+            "Printing only",
+            "File compression",
+            "Image editing"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "HTTPS adds:",
+        "options": [
+            "Secure encrypted communication",
+            "More RAM",
+            "A larger monitor",
+            "A new CPU"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "An IP address identifies a:",
+        "options": [
+            "Networked device/interface",
+            "Keyboard key",
+            "Printer cartridge",
+            "File extension"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Which is a web browser?",
+        "options": [
+            "Chrome",
+            "Windows",
+            "Linux",
+            "Excel"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Which is a search engine?",
+        "options": [
+            "Google",
+            "Windows",
+            "PowerPoint",
+            "Ubuntu"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Which software is used for spreadsheets?",
+        "options": [
+            "Microsoft Excel",
+            "Paint",
+            "Notepad",
+            "Media Player"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Which software is used for presentations?",
+        "options": [
+            "PowerPoint",
+            "Excel",
+            "Calculator",
+            "Notepad"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Which software is used for word processing?",
+        "options": [
+            "Microsoft Word",
+            "Excel",
+            "PowerPoint",
+            "Paint"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Ctrl+C is commonly used to:",
+        "options": [
+            "Copy",
+            "Cut",
+            "Paste",
+            "Save"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Ctrl+V is commonly used to:",
+        "options": [
+            "Paste",
+            "Copy",
+            "Print",
+            "Undo"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Ctrl+X is commonly used to:",
+        "options": [
+            "Cut",
+            "Copy",
+            "Paste",
+            "Open"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Ctrl+S is commonly used to:",
+        "options": [
+            "Save",
+            "Search",
+            "Select",
+            "Share"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Ctrl+Z is commonly used to:",
+        "options": [
+            "Undo",
+            "Redo",
+            "Zoom",
+            "Zip"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "A firewall helps to:",
+        "options": [
+            "Control network traffic",
+            "Print files",
+            "Increase screen size",
+            "Type text"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Antivirus software is designed to:",
+        "options": [
+            "Detect or remove malware",
+            "Create slides",
+            "Format text",
+            "Browse only"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Phishing commonly attempts to:",
+        "options": [
+            "Steal sensitive information through deception",
+            "Improve Wi-Fi speed",
+            "Repair a monitor",
+            "Compress images"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "A strong password should generally be:",
+        "options": [
+            "Hard to guess",
+            "Your first name",
+            "123456",
+            "Password"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Cloud storage means storing data on:",
+        "options": [
+            "Remote internet-connected servers",
+            "Only a keyboard",
+            "A monitor",
+            "A mouse"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "A LAN covers:",
+        "options": [
+            "A limited local area",
+            "The whole world",
+            "Only satellites",
+            "Only oceans"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "WAN stands for:",
+        "options": [
+            "Wide Area Network",
+            "Wireless Access Node",
+            "Web Area Name",
+            "Wide Application Network"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "A router is used to:",
+        "options": [
+            "Forward network traffic",
+            "Print documents",
+            "Scan images",
+            "Play audio"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "A modem commonly connects a network to:",
+        "options": [
+            "An internet service",
+            "A keyboard",
+            "A printer cable only",
+            "A monitor"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Bluetooth is mainly used for:",
+        "options": [
+            "Short-range wireless communication",
+            "Long-distance radio only",
+            "Printing money",
+            "Satellite navigation only"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Wi-Fi provides:",
+        "options": [
+            "Wireless network access",
+            "Only wired power",
+            "Screen brightness",
+            "CPU cooling"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "A database is used to:",
+        "options": [
+            "Organize and store data",
+            "Display only videos",
+            "Power a laptop",
+            "Clean a keyboard"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "A file extension .docx usually indicates:",
+        "options": [
+            "A Word document",
+            "An image",
+            "An audio file",
+            "A web browser"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "A file extension .xlsx usually indicates:",
+        "options": [
+            "An Excel workbook",
+            "A video",
+            "A text-only file",
+            "An executable"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "A file extension .pptx usually indicates:",
+        "options": [
+            "A PowerPoint presentation",
+            "An image",
+            "A database server",
+            "A system driver"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "PDF stands for:",
+        "options": [
+            "Portable Document Format",
+            "Public Data File",
+            "Personal Document Folder",
+            "Printed Data Form"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "The binary number system uses:",
+        "options": [
+            "0 and 1",
+            "1 and 2",
+            "0 to 9",
+            "A to F only"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "An algorithm is:",
+        "options": [
+            "A step-by-step procedure for solving a problem",
+            "A computer monitor",
+            "A storage disk",
+            "A keyboard layout"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Computer",
+        "question": "Backup means:",
+        "options": [
+            "Making an additional copy of data",
+            "Deleting data",
+            "Changing a password only",
+            "Closing a program"
+        ],
+        "answer": 0,
+        "portion": 3
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 18 + 27?",
+        "options": [
+            "43",
+            "45",
+            "47",
+            "50"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 35 + 16?",
+        "options": [
+            "49",
+            "51",
+            "53",
+            "56"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 42 + 19?",
+        "options": [
+            "59",
+            "61",
+            "63",
+            "66"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 56 + 24?",
+        "options": [
+            "78",
+            "80",
+            "82",
+            "85"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 73 + 12?",
+        "options": [
+            "83",
+            "85",
+            "87",
+            "90"
+        ],
+        "answer": 1,
+        "portion": 3
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 29 + 44?",
+        "options": [
+            "71",
+            "73",
+            "75",
+            "78"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 81 + 17?",
+        "options": [
+            "96",
+            "98",
+            "100",
+            "103"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 65 + 28?",
+        "options": [
+            "91",
+            "93",
+            "95",
+            "98"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 47 + 33?",
+        "options": [
+            "78",
+            "80",
+            "82",
+            "85"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 92 + 18?",
+        "options": [
+            "108",
+            "110",
+            "112",
+            "115"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 50 − 17?",
+        "options": [
+            "30",
+            "33",
+            "36",
+            "39"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 72 − 28?",
+        "options": [
+            "41",
+            "44",
+            "47",
+            "50"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 91 − 36?",
+        "options": [
+            "52",
+            "55",
+            "58",
+            "61"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 64 − 19?",
+        "options": [
+            "42",
+            "45",
+            "48",
+            "51"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 83 − 27?",
+        "options": [
+            "53",
+            "56",
+            "59",
+            "62"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 100 − 45?",
+        "options": [
+            "52",
+            "55",
+            "58",
+            "61"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 77 − 18?",
+        "options": [
+            "56",
+            "59",
+            "62",
+            "65"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 69 − 24?",
+        "options": [
+            "42",
+            "45",
+            "48",
+            "51"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 58 − 31?",
+        "options": [
+            "24",
+            "27",
+            "30",
+            "33"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 95 − 42?",
+        "options": [
+            "50",
+            "53",
+            "56",
+            "59"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 7 × 8?",
+        "options": [
+            "54",
+            "56",
+            "58",
+            "61"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 9 × 6?",
+        "options": [
+            "52",
+            "54",
+            "56",
+            "59"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 12 × 4?",
+        "options": [
+            "46",
+            "48",
+            "50",
+            "53"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 11 × 7?",
+        "options": [
+            "75",
+            "77",
+            "79",
+            "82"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 13 × 5?",
+        "options": [
+            "63",
+            "65",
+            "67",
+            "70"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 8 × 9?",
+        "options": [
+            "70",
+            "72",
+            "74",
+            "77"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 14 × 3?",
+        "options": [
+            "40",
+            "42",
+            "44",
+            "47"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 15 × 4?",
+        "options": [
+            "58",
+            "60",
+            "62",
+            "65"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 6 × 11?",
+        "options": [
+            "64",
+            "66",
+            "68",
+            "71"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 10 × 12?",
+        "options": [
+            "118",
+            "120",
+            "122",
+            "125"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 48 ÷ 4?",
+        "options": [
+            "11",
+            "12",
+            "13",
+            "14"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 75 ÷ 5?",
+        "options": [
+            "14",
+            "15",
+            "16",
+            "17"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 84 ÷ 6?",
+        "options": [
+            "13",
+            "14",
+            "15",
+            "16"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 63 ÷ 7?",
+        "options": [
+            "8",
+            "9",
+            "10",
+            "11"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 88 ÷ 8?",
+        "options": [
+            "10",
+            "11",
+            "12",
+            "13"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 117 ÷ 9?",
+        "options": [
+            "12",
+            "13",
+            "14",
+            "15"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 160 ÷ 10?",
+        "options": [
+            "15",
+            "16",
+            "17",
+            "18"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 84 ÷ 12?",
+        "options": [
+            "6",
+            "7",
+            "8",
+            "9"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 88 ÷ 11?",
+        "options": [
+            "7",
+            "8",
+            "9",
+            "10"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 90 ÷ 15?",
+        "options": [
+            "5",
+            "6",
+            "7",
+            "8"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "If 3x = 21, x equals:",
+        "options": [
+            "5",
+            "6",
+            "7",
+            "8"
+        ],
+        "answer": 2,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "If x + 9 = 20, x equals:",
+        "options": [
+            "9",
+            "10",
+            "11",
+            "12"
+        ],
+        "answer": 2,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "If x − 7 = 15, x equals:",
+        "options": [
+            "20",
+            "21",
+            "22",
+            "23"
+        ],
+        "answer": 2,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 20% of 150?",
+        "options": [
+            "20",
+            "25",
+            "30",
+            "35"
+        ],
+        "answer": 2,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 25% of 200?",
+        "options": [
+            "40",
+            "50",
+            "60",
+            "75"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "What is 10% of 450?",
+        "options": [
+            "35",
+            "40",
+            "45",
+            "50"
+        ],
+        "answer": 2,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "The average of 10 and 20 is:",
+        "options": [
+            "12",
+            "15",
+            "20",
+            "30"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "The average of 5, 10 and 15 is:",
+        "options": [
+            "8",
+            "10",
+            "12",
+            "15"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "A number divisible by 2 is always:",
+        "options": [
+            "Odd",
+            "Even",
+            "Prime",
+            "Negative"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Mathematics & IQ",
+        "question": "The next number in 2, 4, 6, 8, ___ is:",
+        "options": [
+            "9",
+            "10",
+            "11",
+            "12"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "پاکستان کی قومی زبان کون سی ہے؟",
+        "options": [
+            "پنجابی",
+            "اردو",
+            "سندھی",
+            "پشتو"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'خوش' کا متضاد کیا ہے؟",
+        "options": [
+            "غمگین",
+            "مسعود",
+            "شاد",
+            "مسرور"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'بڑا' کا متضاد کیا ہے؟",
+        "options": [
+            "لمبا",
+            "چھوٹا",
+            "اونچا",
+            "موٹا"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'خوبصورت' کا مترادف کیا ہے؟",
+        "options": [
+            "حسین",
+            "بدصورت",
+            "کمزور",
+            "سخت"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'آسمان' کی جمع کیا ہے؟",
+        "options": [
+            "آسمانوں",
+            "آسمانات",
+            "آسمین",
+            "آسمان"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'کتاب' کی جمع کیا ہے؟",
+        "options": [
+            "کتابیں",
+            "کتابات",
+            "کتابان",
+            "کتبہ"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'بچہ' کی جمع کیا ہے؟",
+        "options": [
+            "بچے",
+            "بچیاں",
+            "بچگان",
+            "بچوں"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'استاد' کی جمع کیا ہے؟",
+        "options": [
+            "اساتذہ",
+            "استادیں",
+            "استادان",
+            "استادوں"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'لڑکا' کی مونث کیا ہے؟",
+        "options": [
+            "لڑکی",
+            "بچہ",
+            "عورت",
+            "خاتون"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'شاعر' کی مونث کیا ہے؟",
+        "options": [
+            "شاعری",
+            "شاعرہ",
+            "شاعرانہ",
+            "اداکارہ"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'بادشاہ' کی مونث کیا ہے؟",
+        "options": [
+            "ملکہ",
+            "شہزادی",
+            "بیوی",
+            "حکمران"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'صبح' کا متضاد کیا ہے؟",
+        "options": [
+            "دن",
+            "شام",
+            "دوپہر",
+            "رات"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'سچ' کا متضاد کیا ہے؟",
+        "options": [
+            "حق",
+            "جھوٹ",
+            "صدق",
+            "ایمان"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'آسان' کا متضاد کیا ہے؟",
+        "options": [
+            "سادہ",
+            "مشکل",
+            "سہل",
+            "ہلکا"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'علم' کا مترادف کیا ہے؟",
+        "options": [
+            "دانش",
+            "جہالت",
+            "غربت",
+            "طاقت"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'خوشی' کا مترادف کیا ہے؟",
+        "options": [
+            "مسرت",
+            "غم",
+            "خوف",
+            "غصہ"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'غم' کا مترادف کیا ہے؟",
+        "options": [
+            "رنج",
+            "خوشی",
+            "مسرت",
+            "شادمانی"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'دوست' کا مترادف کیا ہے؟",
+        "options": [
+            "رفیق",
+            "دشمن",
+            "مخالف",
+            "حریف"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'دشمن' کا متضاد کیا ہے؟",
+        "options": [
+            "حریف",
+            "دوست",
+            "مخالف",
+            "عدو"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'سفید' کا متضاد کیا ہے؟",
+        "options": [
+            "سرخ",
+            "کالا",
+            "سبز",
+            "زرد"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'اونچا' کا متضاد کیا ہے؟",
+        "options": [
+            "بلند",
+            "پست",
+            "عظیم",
+            "لمبا"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'نیا' کا متضاد کیا ہے؟",
+        "options": [
+            "تازہ",
+            "پرانا",
+            "جدید",
+            "نو"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'قریب' کا متضاد کیا ہے؟",
+        "options": [
+            "نزدیک",
+            "دور",
+            "پاس",
+            "ساتھ"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'دن' کا متضاد کیا ہے؟",
+        "options": [
+            "رات",
+            "صبح",
+            "روشنی",
+            "سورج"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'جلدی' کا متضاد کیا ہے؟",
+        "options": [
+            "فوراً",
+            "دیر",
+            "تیزی",
+            "جلد"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'دلیر' کا مترادف کیا ہے؟",
+        "options": [
+            "بہادر",
+            "بزدل",
+            "کمزور",
+            "خاموش"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'بزدل' کا متضاد کیا ہے؟",
+        "options": [
+            "کمزور",
+            "بہادر",
+            "ڈرپوک",
+            "سست"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'محنت' کا مترادف کیا ہے؟",
+        "options": [
+            "کوشش",
+            "آرام",
+            "غفلت",
+            "سستی"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'آزادی' کا متضاد کیا ہے؟",
+        "options": [
+            "خودمختاری",
+            "غلامی",
+            "اختیار",
+            "آزادی"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'اندھیرا' کا متضاد کیا ہے؟",
+        "options": [
+            "روشنی",
+            "رات",
+            "سایہ",
+            "دھند"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'خوش اخلاق' کا مفہوم کیا ہے؟",
+        "options": [
+            "اچھے اخلاق والا",
+            "غصے والا",
+            "سست",
+            "کمزور"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'آسمان سے گرا کھجور میں اٹکا' کا مفہوم ہے:",
+        "options": [
+            "ایک مشکل سے نکل کر دوسری میں پھنسنا",
+            "بہت خوش ہونا",
+            "سفر کرنا",
+            "کامیاب ہونا"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'اونٹ کے منہ میں زیرہ' کا مفہوم ہے:",
+        "options": [
+            "ضرورت سے بہت کم",
+            "بہت زیادہ",
+            "بے حد آسان",
+            "بہت مہنگا"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'نیکی کر دریا میں ڈال' کا مفہوم ہے:",
+        "options": [
+            "نیکی کرکے صلہ کی توقع نہ رکھنا",
+            "نیکی چھوڑ دینا",
+            "دریا میں جانا",
+            "بدلہ لینا"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'ایک انار سو بیمار' کا مفہوم ہے:",
+        "options": [
+            "چاہنے والے بہت، چیز کم",
+            "بہت صحت مند ہونا",
+            "بیماری پھیلانا",
+            "انار کھانا"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'چور کی داڑھی میں تنکا' کا مفہوم ہے:",
+        "options": [
+            "قصوروار خود ظاہر ہو جاتا ہے",
+            "چور بہت بہادر ہے",
+            "چوری آسان ہے",
+            "داڑھی رکھنا"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "اردو کے مشہور شاعر 'شاعرِ مشرق' کون ہیں؟",
+        "options": [
+            "علامہ اقبال",
+            "غالب",
+            "میر",
+            "فیض"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "مرزا غالب کا تعلق بنیادی طور پر کس صنف سے ہے؟",
+        "options": [
+            "شاعری",
+            "سائنس",
+            "صحافت",
+            "طب"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "فیض احمد فیض مشہور تھے:",
+        "options": [
+            "شاعری کے لیے",
+            "ریاضی کے لیے",
+            "طب کے لیے",
+            "فلکیات کے لیے"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "علامہ اقبال کی مشہور نظم 'لب پہ آتی ہے دعا' ہے:",
+        "options": [
+            "بچوں کی دعا",
+            "غزل",
+            "قصیدہ",
+            "مرثیہ"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "اسم کس کو کہتے ہیں؟",
+        "options": [
+            "نام بتانے والا لفظ",
+            "کام بتانے والا لفظ",
+            "صفت بتانے والا لفظ",
+            "حرف"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "فعل کس کو کہتے ہیں؟",
+        "options": [
+            "کام یا عمل بتانے والا لفظ",
+            "نام بتانے والا لفظ",
+            "رنگ بتانے والا لفظ",
+            "عدد"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "صفت کس کو کہتے ہیں؟",
+        "options": [
+            "خوبی یا حالت بتانے والا لفظ",
+            "نام",
+            "عمل",
+            "حرف"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "ضمیر کس کی جگہ آتا ہے؟",
+        "options": [
+            "اسم",
+            "فعل",
+            "صفت",
+            "حرف"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'اور' کس قسم کا لفظ ہے؟",
+        "options": [
+            "حرفِ عطف",
+            "اسم",
+            "فعل",
+            "صفت"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'لیکن' عام طور پر کس لیے استعمال ہوتا ہے؟",
+        "options": [
+            "دو باتوں میں تضاد ظاہر کرنے کے لیے",
+            "وقت بتانے کے لیے",
+            "نام بتانے کے لیے",
+            "عدد بتانے کے لیے"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'خوب' کس قسم کا لفظ ہو سکتا ہے؟",
+        "options": [
+            "صفت/حال کے طور پر",
+            "ضمیر",
+            "حرفِ ندا",
+            "اسمِ خاص"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'وہ اسکول گیا' میں 'وہ' کیا ہے؟",
+        "options": [
+            "ضمیر",
+            "اسم",
+            "فعل",
+            "صفت"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'علی پڑھتا ہے' میں فعل کون سا ہے؟",
+        "options": [
+            "علی",
+            "پڑھتا ہے",
+            "ہے",
+            "علی پڑھتا"
+        ],
+        "answer": 1,
+        "portion": 4
+    },
+    {
+        "subject": "Urdu",
+        "question": "'خوبصورت پھول' میں صفت کون سی ہے؟",
+        "options": [
+            "خوبصورت",
+            "پھول",
+            "خوب",
+            "کوئی نہیں"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The United Nations was founded in:",
+        "options": [
+            "1945",
+            "1947",
+            "1950",
+            "1955"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The headquarters of NATO is in:",
+        "options": [
+            "Brussels",
+            "Paris",
+            "Berlin",
+            "Rome"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The headquarters of the World Bank is in:",
+        "options": [
+            "Washington, D.C.",
+            "Geneva",
+            "London",
+            "Tokyo"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The headquarters of the Asian Development Bank is in:",
+        "options": [
+            "Manila",
+            "Beijing",
+            "Tokyo",
+            "Jakarta"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The headquarters of the International Atomic Energy Agency is in:",
+        "options": [
+            "Vienna",
+            "Geneva",
+            "Paris",
+            "Rome"
+        ],
+        "answer": 0,
+        "portion": 4
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The headquarters of the International Court of Justice is in:",
+        "options": [
+            "The Hague",
+            "New York",
+            "London",
+            "Geneva"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The headquarters of the International Criminal Court is in:",
+        "options": [
+            "The Hague",
+            "Brussels",
+            "Paris",
+            "Vienna"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The headquarters of Interpol is in:",
+        "options": [
+            "Lyon",
+            "Rome",
+            "London",
+            "Madrid"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The headquarters of the Commonwealth Secretariat is in:",
+        "options": [
+            "London",
+            "New York",
+            "Ottawa",
+            "Canberra"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The headquarters of SAARC is in:",
+        "options": [
+            "Kathmandu",
+            "Islamabad",
+            "Dhaka",
+            "Colombo"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The headquarters of ASEAN is in:",
+        "options": [
+            "Jakarta",
+            "Bangkok",
+            "Manila",
+            "Kuala Lumpur"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The headquarters of the Arab League is in:",
+        "options": [
+            "Cairo",
+            "Riyadh",
+            "Amman",
+            "Doha"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The headquarters of the European Union institutions are mainly associated with:",
+        "options": [
+            "Brussels",
+            "Madrid",
+            "Lisbon",
+            "Athens"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The UN Security Council has how many permanent members?",
+        "options": [
+            "3",
+            "5",
+            "7",
+            "10"
+        ],
+        "answer": 1,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The permanent members of the UN Security Council are commonly known as the:",
+        "options": [
+            "P5",
+            "G5",
+            "G7",
+            "G20"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The G7 is a group of:",
+        "options": [
+            "Major advanced economies",
+            "South Asian states only",
+            "UN agencies",
+            "Sports bodies"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The G20 is a forum of:",
+        "options": [
+            "Major economies",
+            "Only European countries",
+            "Only UN members from Asia",
+            "Military alliances"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "WHO primarily deals with:",
+        "options": [
+            "Global health",
+            "World trade",
+            "Postal services",
+            "Civil aviation"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "UNESCO primarily deals with:",
+        "options": [
+            "Education, science and culture",
+            "Military affairs",
+            "Oil production",
+            "Banking"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "UNICEF focuses mainly on:",
+        "options": [
+            "Children",
+            "Air travel",
+            "Oil exports",
+            "Trade tariffs"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "UNHCR is mainly concerned with:",
+        "options": [
+            "Refugees",
+            "Weather",
+            "Sports",
+            "Telecommunications"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "FAO is associated with:",
+        "options": [
+            "Food and agriculture",
+            "Banking",
+            "Aviation",
+            "Nuclear weapons"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "ILO deals primarily with:",
+        "options": [
+            "Labour and employment",
+            "Tourism",
+            "Space exploration",
+            "Postal services"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "WTO deals primarily with:",
+        "options": [
+            "International trade",
+            "Health",
+            "Education",
+            "Refugees"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "IMF mainly promotes:",
+        "options": [
+            "International monetary cooperation",
+            "Sports",
+            "Archaeology",
+            "Literature"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The World Bank is primarily associated with:",
+        "options": [
+            "Development financing",
+            "Weather forecasting",
+            "Military alliances",
+            "Film production"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The Paris Agreement is related to:",
+        "options": [
+            "Climate change",
+            "International cricket",
+            "Maritime law",
+            "Postal services"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The Sustainable Development Goals are commonly abbreviated as:",
+        "options": [
+            "SDGs",
+            "STGs",
+            "SAGs",
+            "SDEs"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The number of UN Sustainable Development Goals is:",
+        "options": [
+            "15",
+            "17",
+            "20",
+            "25"
+        ],
+        "answer": 1,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "World Environment Day is observed on:",
+        "options": [
+            "5 June",
+            "8 March",
+            "22 April",
+            "1 May"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "International Women's Day is observed on:",
+        "options": [
+            "8 March",
+            "5 June",
+            "10 December",
+            "1 May"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "Human Rights Day is observed on:",
+        "options": [
+            "10 December",
+            "5 June",
+            "24 October",
+            "1 January"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "United Nations Day is observed on:",
+        "options": [
+            "24 October",
+            "14 August",
+            "5 June",
+            "1 May"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "World Health Day is observed on:",
+        "options": [
+            "7 April",
+            "1 May",
+            "10 December",
+            "24 October"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "Earth Day is observed on:",
+        "options": [
+            "22 April",
+            "22 May",
+            "5 June",
+            "8 March"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "World Water Day is observed on:",
+        "options": [
+            "22 March",
+            "22 April",
+            "5 June",
+            "16 September"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "World Literacy Day is observed on:",
+        "options": [
+            "8 September",
+            "21 September",
+            "24 October",
+            "10 December"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "International Day of Peace is observed on:",
+        "options": [
+            "21 September",
+            "8 September",
+            "5 June",
+            "1 May"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The International Olympic Committee is abbreviated as:",
+        "options": [
+            "IOC",
+            "ICC",
+            "ICJ",
+            "ILO"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "FIFA is the international governing body for:",
+        "options": [
+            "Football",
+            "Cricket",
+            "Tennis",
+            "Hockey"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "ICC is associated with:",
+        "options": [
+            "Cricket",
+            "Football",
+            "Hockey",
+            "Athletics"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The Nobel Peace Prize is awarded in:",
+        "options": [
+            "Oslo",
+            "Stockholm",
+            "Geneva",
+            "Paris"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The Nobel Prizes were established by:",
+        "options": [
+            "Alfred Nobel",
+            "Isaac Newton",
+            "Albert Einstein",
+            "Marie Curie"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The currency used by many European Union countries is:",
+        "options": [
+            "Euro",
+            "Pound",
+            "Franc",
+            "Yen"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The Schengen Area is associated with:",
+        "options": [
+            "Passport-free travel among participating states",
+            "A military alliance only",
+            "A currency only",
+            "A sports league"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The African Union headquarters is in:",
+        "options": [
+            "Addis Ababa",
+            "Cairo",
+            "Nairobi",
+            "Lagos"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Current Affairs & International",
+        "question": "The headquarters of the Organization of American States is in:",
+        "options": [
+            "Washington, D.C.",
+            "New York",
+            "Ottawa",
+            "Mexico City"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "PPC stands for:",
+        "options": [
+            "Pakistan Penal Code",
+            "Public Police Code",
+            "Pakistan Protection Charter",
+            "Provincial Penal Court"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "CrPC stands for:",
+        "options": [
+            "Code of Criminal Procedure",
+            "Criminal Police Rules Code",
+            "Court Procedure Rules Code",
+            "Criminal Protection Regulation Code"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "FIR commonly stands for:",
+        "options": [
+            "First Information Report",
+            "Federal Investigation Record",
+            "Final Inquiry Report",
+            "First Inspection Register"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "FIR is generally associated with:",
+        "options": [
+            "Reporting a cognizable offence to police",
+            "Issuing a passport",
+            "Paying taxes",
+            "Registering a vehicle only"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "The Constitution of Pakistan is the country's:",
+        "options": [
+            "Supreme legal framework",
+            "Traffic manual",
+            "Police diary",
+            "Tax receipt"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "Fundamental Rights are primarily contained in:",
+        "options": [
+            "The Constitution",
+            "A school timetable",
+            "A bank statement",
+            "A weather report"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "The Supreme Court is part of the:",
+        "options": [
+            "Judiciary",
+            "Executive",
+            "Legislature",
+            "Election campaign"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "The National Assembly is part of the:",
+        "options": [
+            "Parliament",
+            "Judiciary",
+            "Police department",
+            "Civil court"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "The Senate is the:",
+        "options": [
+            "Upper House of Parliament",
+            "Lower House",
+            "Supreme Court",
+            "Cabinet only"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "A police officer's primary public role includes:",
+        "options": [
+            "Maintaining law and order and protecting citizens",
+            "Running banks",
+            "Issuing university degrees",
+            "Collecting customs at airports only"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "A witness is a person who:",
+        "options": [
+            "Provides information about an event relevant to a case",
+            "Writes laws only",
+            "Owns a police station",
+            "Issues currency"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "An accused person is someone who:",
+        "options": [
+            "Is alleged to have committed an offence",
+            "Has automatically been convicted",
+            "Is always a witness",
+            "Is a judge"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "A judge primarily:",
+        "options": [
+            "Interprets and applies law in court",
+            "Investigates every case personally",
+            "Issues passports",
+            "Runs elections"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "A prosecutor generally:",
+        "options": [
+            "Presents the case on behalf of the state",
+            "Maintains roads",
+            "Prints currency",
+            "Runs hospitals"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "Bail generally relates to:",
+        "options": [
+            "Temporary release subject to legal conditions",
+            "Permanent acquittal in every case",
+            "A police promotion",
+            "A driving test"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "A warrant is generally:",
+        "options": [
+            "A legal authorization issued by a competent authority",
+            "A school certificate",
+            "A tax bill",
+            "A weather warning"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "Evidence is used to:",
+        "options": [
+            "Support or challenge facts in a case",
+            "Replace the Constitution",
+            "Set fuel prices",
+            "Issue passports"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "A crime scene is:",
+        "options": [
+            "The place connected with an alleged offence",
+            "A police training classroom only",
+            "A courtroom only",
+            "A parliament chamber"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "A legal complaint is generally:",
+        "options": [
+            "An allegation or report seeking action by an authority",
+            "A university degree",
+            "A bank cheque",
+            "A weather forecast"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "A constitution primarily defines:",
+        "options": [
+            "The structure and powers of the state and rights",
+            "Only traffic signs",
+            "Only school rules",
+            "Only banking rates"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "The executive branch primarily:",
+        "options": [
+            "Implements laws and runs administration",
+            "Interprets laws in courts",
+            "Makes judgments only",
+            "Writes newspapers"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "The legislature primarily:",
+        "options": [
+            "Makes laws",
+            "Conducts medical operations",
+            "Runs police investigations only",
+            "Issues court verdicts"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "The judiciary primarily:",
+        "options": [
+            "Interprets and adjudicates law",
+            "Makes the national budget alone",
+            "Runs elections alone",
+            "Prints currency"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "A citizen's legal rights are subject to:",
+        "options": [
+            "The Constitution and applicable law",
+            "Weather conditions",
+            "School attendance only",
+            "Social media trends"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "A public servant is expected to act with:",
+        "options": [
+            "Integrity and impartiality",
+            "Personal favoritism",
+            "Secrecy in all matters",
+            "No accountability"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "Corruption generally means:",
+        "options": [
+            "Abuse of entrusted power for improper gain",
+            "Following rules",
+            "Public service",
+            "Lawful administration"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "Bribery generally involves:",
+        "options": [
+            "Giving or receiving an improper benefit to influence action",
+            "Paying a normal fee",
+            "Voting in an election",
+            "Filing a lawful application"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "Accountability means:",
+        "options": [
+            "Being answerable for one's actions",
+            "Avoiding all records",
+            "Ignoring complaints",
+            "Making secret rules"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "Transparency in public administration means:",
+        "options": [
+            "Openness and access to appropriate information",
+            "Hiding all decisions",
+            "Destroying records",
+            "Avoiding oversight"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "Rule of law means:",
+        "options": [
+            "Law applies and governs rather than arbitrary power",
+            "Only police follow law",
+            "Judges make all laws",
+            "No one needs legal rules"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "Due process generally protects:",
+        "options": [
+            "Fair legal procedures",
+            "Only property prices",
+            "Only elections",
+            "Only traffic rules"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "Presumption of innocence means an accused is:",
+        "options": [
+            "Treated as innocent until proven guilty according to law",
+            "Automatically guilty",
+            "Automatically acquitted",
+            "Never allowed a lawyer"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "A court order is issued by:",
+        "options": [
+            "A competent court",
+            "A private shop",
+            "A school teacher",
+            "A bank cashier"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "An appeal generally asks a higher court to:",
+        "options": [
+            "Review a lower court decision",
+            "Issue a passport",
+            "Hire a police officer",
+            "Set a fuel price"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "Jurisdiction refers to:",
+        "options": [
+            "Legal authority of a court or body",
+            "A police uniform",
+            "A tax receipt",
+            "A newspaper"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "A legal precedent is:",
+        "options": [
+            "An earlier judicial decision that may guide later cases",
+            "A police vehicle",
+            "A government building",
+            "A school certificate"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "A statute is:",
+        "options": [
+            "A law enacted by a legislature",
+            "A court witness",
+            "A police rank",
+            "A weather report"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "An ordinance is generally:",
+        "options": [
+            "A law or regulation made under legal authority",
+            "A private contract only",
+            "A school exam",
+            "A newspaper article"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "A constitutional amendment is:",
+        "options": [
+            "A formal change to the Constitution",
+            "A police report",
+            "A traffic ticket",
+            "A court witness"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "Human rights are:",
+        "options": [
+            "Basic rights and freedoms recognized for people",
+            "Privileges only for officials",
+            "Police ranks",
+            "Tax categories"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "Equality before law means:",
+        "options": [
+            "People are subject to the law without unlawful discrimination",
+            "Officials are above law",
+            "Only judges have rights",
+            "Rules apply only to visitors"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "Freedom of expression is a:",
+        "options": [
+            "Fundamental right subject to constitutional/legal limits",
+            "Police rank",
+            "Tax category",
+            "Court fee"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "Freedom of religion is protected as a:",
+        "options": [
+            "Constitutional right",
+            "Driving license",
+            "Tax exemption for everyone",
+            "Police procedure"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "A public record is generally:",
+        "options": [
+            "Information/document maintained by a public authority",
+            "A private password",
+            "A personal diary only",
+            "A shopping list"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "Official misconduct can involve:",
+        "options": [
+            "Improper conduct in public office",
+            "Following lawful instructions",
+            "Keeping accurate records",
+            "Serving citizens fairly"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "A complaint register is used to:",
+        "options": [
+            "Record complaints or reports",
+            "Print currency",
+            "Issue passports",
+            "Store fuel"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "Professional conduct requires:",
+        "options": [
+            "Respect, integrity and lawful behavior",
+            "Favoritism",
+            "Threats",
+            "Ignoring procedures"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "The purpose of law enforcement is primarily to:",
+        "options": [
+            "Uphold law, protect people and maintain public order",
+            "Replace courts",
+            "Make all laws",
+            "Control private businesses"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "A lawful investigation should be based on:",
+        "options": [
+            "Evidence and applicable law",
+            "Rumors only",
+            "Personal preference",
+            "Social media comments"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "Confidentiality in public service means:",
+        "options": [
+            "Protecting information that is legally required to remain confidential",
+            "Sharing every record publicly",
+            "Deleting records",
+            "Ignoring citizens"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "Impartiality means:",
+        "options": [
+            "Treating relevant cases and people fairly without improper favoritism",
+            "Helping friends first",
+            "Ignoring rules",
+            "Following rumors"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "A code of conduct is intended to:",
+        "options": [
+            "Set standards for professional behavior",
+            "Replace the Constitution",
+            "Issue court judgments",
+            "Set weather forecasts"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "A complaint should generally be handled:",
+        "options": [
+            "According to applicable procedure and law",
+            "By ignoring it",
+            "By deleting it",
+            "By deciding guilt immediately"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "Which principle requires a public officer to avoid personal favoritism?",
+        "options": [
+            "Impartiality",
+            "Negligence",
+            "Delay",
+            "Secrecy"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "Which term means keeping official information protected when law requires confidentiality?",
+        "options": [
+            "Confidentiality",
+            "Competition",
+            "Publicity",
+            "Delegation"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "What should a police record primarily contain?",
+        "options": [
+            "Accurate relevant information",
+            "Rumors",
+            "Personal opinions only",
+            "Unverified social media posts"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "Which quality helps a public officer make fair decisions?",
+        "options": [
+            "Integrity",
+            "Favoritism",
+            "Bias",
+            "Carelessness"
+        ],
+        "answer": 0,
+        "portion": 5
+    },
+    {
+        "subject": "Police & Law Basics",
+        "question": "A professional complaint process should follow:",
+        "options": [
+            "Established law and procedure",
+            "Personal preference",
+            "Rumor",
+            "Guesswork"
+        ],
+        "answer": 0,
+        "portion": 5
+    }
+];
+
+
+/* =========================
+   VARIABLES
+========================= */
+
+let quizQuestions = [];
+let currentQuestion = 0;
+let userAnswers = [];
+let timer;
+let timeLeft = 0;
+
+
+/* =========================
+   START QUIZ
+========================= */
+
+function startQuiz() {
+
+    const portion =
+        parseInt(document.getElementById("portionSelect").value);
+
+    const subject =
+        document.getElementById("subjectSelect").value;
+
+    const count =
+        parseInt(document.getElementById("questionCount").value);
+
+    timeLeft =
+        parseInt(document.getElementById("timeSelect").value);
+
+
+    /* Filter questions */
+
+    quizQuestions = questions.filter(q =>
+        q.portion === portion &&
+        (subject === "All" || q.subject === subject)
+    );
+
+
+    /* Randomize questions */
+
+    quizQuestions.sort(() => Math.random() - 0.5);
+
+
+    /* Limit number */
+
+    quizQuestions =
+        quizQuestions.slice(
+            0,
+            Math.min(count, quizQuestions.length)
+        );
+
+
+    if (quizQuestions.length === 0) {
+
+        alert("No questions available for this subject.");
+
+        return;
+    }
+
+
+    userAnswers =
+        new Array(quizQuestions.length).fill(null);
+
+    currentQuestion = 0;
+
+
+    showScreen("quizScreen");
+
+    showQuestion();
+
+    startTimer();
+}
+
+
+/* =========================
+   SHOW QUESTION
+========================= */
+
+function showQuestion() {
+
+    const q =
+        quizQuestions[currentQuestion];
+
+
+    document.getElementById("progress").innerText =
+        `Question ${currentQuestion + 1} / ${quizQuestions.length}`;
+
+
+    document.getElementById("question").innerText =
+        q.question;
+
+
+    const optionsDiv =
+        document.getElementById("options");
+
+    optionsDiv.innerHTML = "";
+
+
+    q.options.forEach((option, index) => {
+
+        const button =
+            document.createElement("button");
+
+        button.className = "option";
+
+        button.innerText =
+            `${String.fromCharCode(65 + index)}) ${option}`;
+
+
+        if (userAnswers[currentQuestion] === index) {
+
+            button.classList.add("selected");
+
+        }
+
+
+        button.onclick = function() {
+
+            selectAnswer(index);
+
+        };
+
+
+        optionsDiv.appendChild(button);
+
+    });
+
+}
+
+
+/* =========================
+   SELECT ANSWER
+========================= */
+
+function selectAnswer(index) {
+
+    userAnswers[currentQuestion] = index;
+
+    showQuestion();
+
+}
+
+
+/* =========================
+   NEXT QUESTION
+========================= */
+
+function nextQuestion() {
+
+    if (currentQuestion <
+        quizQuestions.length - 1) {
+
+        currentQuestion++;
+
+        showQuestion();
+
+    } else {
+
+        finishQuiz();
+
+    }
+
+}
+
+
+/* =========================
+   PREVIOUS QUESTION
+========================= */
+
+function previousQuestion() {
+
+    if (currentQuestion > 0) {
+
+        currentQuestion--;
+
+        showQuestion();
+
+    }
+
+}
+
+
+/* =========================
+   TIMER
+========================= */
+
+function startTimer() {
+
+    clearInterval(timer);
+
+    updateTimer();
+
+
+    timer = setInterval(() => {
+
+        timeLeft--;
+
+        updateTimer();
+
+
+        if (timeLeft <= 0) {
+
+            clearInterval(timer);
+
+            alert("Time is over!");
+
+            finishQuiz();
+
+        }
+
+    }, 1000);
+
+}
+
+
+function updateTimer() {
+
+    const minutes =
+        Math.floor(timeLeft / 60);
+
+    const seconds =
+        timeLeft % 60;
+
+
+    document.getElementById("timer").innerText =
+
+        `${String(minutes).padStart(2, "0")}:` +
+        `${String(seconds).padStart(2, "0")}`;
+
+}
+
+
+/* =========================
+   FINISH QUIZ
+========================= */
+
+function finishQuiz() {
+
+    clearInterval(timer);
+
+
+    let correct = 0;
+
+
+    quizQuestions.forEach((q, index) => {
+
+        if (userAnswers[index] === q.answer) {
+
+            correct++;
+
+        }
+
+    });
+
+
+    const wrong =
+        quizQuestions.length - correct;
+
+
+    const percentage =
+        Math.round(
+            (correct / quizQuestions.length) * 100
+        );
+
+
+    document.getElementById("score").innerText =
+        `${percentage}%`;
+
+    document.getElementById("correctResult").innerText =
+        `Correct: ${correct}`;
+
+    document.getElementById("wrongResult").innerText =
+        `Wrong: ${wrong}`;
+
+    document.getElementById("totalResult").innerText =
+        `Total: ${quizQuestions.length}`;
+
+    document.getElementById("totalScoreResult").innerText =
+        `Total Score: ${correct} / ${quizQuestions.length}`;
+
+
+    createReview();
+
+
+    showScreen("resultScreen");
+
+}
+
+
+/* =========================
+   ANSWER REVIEW
+========================= */
+
+function createReview() {
+
+    const review =
+        document.getElementById("reviewList");
+
+    review.innerHTML = "";
+
+
+    quizQuestions.forEach((q, index) => {
+
+        const item =
+            document.createElement("div");
+
+        item.className =
+            "review-item";
+
+
+        const userAnswer =
+            userAnswers[index];
+
+
+        const isCorrect =
+            userAnswer === q.answer;
+
+
+        item.innerHTML = `
+
+            <p>
+                <strong>
+                    ${index + 1}. ${q.question}
+                </strong>
+            </p>
+
+            <br>
+
+            <p>
+                Your Answer:
+                <span class="${
+                    isCorrect
+                    ? "correct-text"
+                    : "wrong-text"
+                }">
+
+                    ${
+                        userAnswer === null
+                        ? "Not Answered"
+                        : q.options[userAnswer]
+                    }
+
+                </span>
+            </p>
+
+            <p>
+                Correct Answer:
+                <span class="correct-text">
+                    ${q.options[q.answer]}
+                </span>
+            </p>
+
+        `;
+
+
+        review.appendChild(item);
+
+    });
+
+}
+
+
+/* =========================
+   SCREEN CONTROL
+========================= */
+
+function showScreen(screenId) {
+
+    document
+        .querySelectorAll(".screen")
+        .forEach(screen => {
+
+            screen.classList.remove("active");
+
+        });
+
+
+    document
+        .getElementById(screenId)
+        .classList.add("active");
+
+}
+
+
+/* =========================
+   HOME
+========================= */
+
+function showHome() {
+
+    clearInterval(timer);
+
+    showScreen("homeScreen");
+
+}
+
+</script>
+
+</body>
+</html>
